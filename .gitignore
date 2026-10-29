@@ -1,0 +1,35 @@
+# Local Python environments and application runtime files
+.venv/
+.venv-*/
+.runtime/
+__pycache__/
+*.pyc
+*.pyo
+
+# Local secrets; keep shareable examples
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Generated application packages
+/Apps/**/build/
+/Apps/**/dist/
+
+# Datasets are stored separately; lightweight manifests may be tracked
+/Datasets/*
+!/Datasets/.gitkeep
+!/Datasets/Manifests/
+
+# Model artifacts stay local; model descriptions/configuration remain trackable
+/Models/**/*.pt
+/Models/**/*.pth
+/Models/**/*.onnx
+/Models/**/*.engine
+/Models/**/*.ckpt
+/Models/**/*.safetensors
+/Models/**/*.tflite
+
+# OS-generated files
+Thumbs.db
+.DS_Store

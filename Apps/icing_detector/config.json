@@ -1,0 +1,10 @@
+{
+  "model_path": "../../Models/aircraft-ice-detection-1-yolo26s-t1/weights.pt",
+  "model_name": "Aircraft Icing · YOLO26 Small v1",
+  "expected_sha256": "15a0083a9cda998a52515e63c7f78d93735fa2201d467818d9aefb1f54c84e60",
+  "input_size": 640,
+  "max_detections": 300,
+  "ultralytics_version": "8.4.55",
+  "confidence": 0.25,
+  "iou": 0.5
+}
