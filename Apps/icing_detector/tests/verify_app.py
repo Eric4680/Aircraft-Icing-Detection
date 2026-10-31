@@ -133,7 +133,7 @@ def main():
         # Keep hover tests independent of the live desktop cursor; native tests
         # below still exercise rendering, buttons, sliders and actual inference.
         if not args.native:
-            for control_name in ("confidenceControl", "iouControl", "opacityControl"):
+            for control_name in ("confidenceControl", "iouControl"):
                 help_button = window.findChild(QObject, control_name + "_help")
                 tooltip = window.findChild(QObject, control_name + "_tooltip")
                 point = help_button.mapToScene(QPointF(help_button.width() / 2, help_button.height() / 2)).toPoint()

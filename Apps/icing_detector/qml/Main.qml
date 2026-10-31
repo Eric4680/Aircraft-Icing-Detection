@@ -219,7 +219,7 @@ ApplicationWindow {
                             Text { text: "检测参数"; color: Theme.muted; font.pixelSize: 10; font.weight: Font.DemiBold }
                             ThresholdControl { objectName: "confidenceControl"; Layout.fillWidth: true; title: "置信度阈值"; value: root.s.confidence; helpText: "只显示可信度达到该数值的检测框。调高可减少误报，调低可找到更多疑似结冰区域。"; onEdited: function(value) { studio.setConfidence(value) } }
                             ThresholdControl { objectName: "iouControl"; Layout.fillWidth: true; title: "重叠阈值 · IoU"; value: root.s.iou; applicable: root.s.ready && !root.s.endToEnd; helpText: !root.s.ready ? "模型加载后会判断是否需要此项。" : root.s.endToEnd ? "用于筛除位置重复的检测框。当前模型不使用这一步，因此无需调整。" : "用于筛除重复框：数值越低，重叠框越容易被去除。"; onEdited: function(value) { studio.setIou(value) } }
-                            ThresholdControl { objectName: "opacityControl"; Layout.fillWidth: true; title: "检测框不透明度"; value: root.s.opacity; helpText: "0% 完全透明，100% 完全不透明。只改变显示效果，不影响检测结果。"; onEdited: function(value) { studio.setOpacity(value) } }
+                            ThresholdControl { objectName: "opacityControl"; Layout.fillWidth: true; title: "检测框不透明度"; value: root.s.opacity; onEdited: function(value) { studio.setOpacity(value) } }
                             ColumnLayout {
                                 Layout.fillWidth: true; spacing: 8
                                 Text { text: "标签显示"; color: Theme.text; font.pixelSize: 12; font.weight: Font.Medium }
