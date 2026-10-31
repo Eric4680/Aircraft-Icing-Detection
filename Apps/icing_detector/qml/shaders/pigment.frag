@@ -152,6 +152,8 @@ void main(){
  col+=vec3(.80,.90,1.)*waterMotion.z;
  col+=(hash(uv*resolution)-.5)*.003;
  col=clamp(col,0.,1.);
+ // Near-white ice blue in the light theme; retain the existing dark palette.
+ col=mix(vec3(1.),col,mix(.25,1.,darkMode));
  col=mix(col,col*.18+vec3(.025,.040,.065),darkMode);
  fragColor=vec4(col,1.)*qt_Opacity;
 }
