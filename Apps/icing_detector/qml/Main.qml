@@ -15,6 +15,8 @@ ApplicationWindow {
     property var boxes: studio.detections
     Binding { target: Theme; property: "dark"; value: root.s.theme === "dark" }
     Binding { target: Theme; property: "reducedMotion"; value: root.s.reducedMotion }
+    Binding { target: Theme; property: "backdrop"; value: liquidLoader.item ? liquidLoader.item.texture : null }
+    Binding { target: Theme; property: "glassEnabled"; value: liquidLoader.item ? liquidLoader.item.shaderReady : false }
     palette.window: Theme.panel; palette.base: Theme.panel; palette.text: Theme.text
     palette.buttonText: Theme.text; palette.highlight: Theme.accent
     font.family: "Microsoft YaHei UI"
@@ -28,10 +30,28 @@ ApplicationWindow {
     Shortcut { sequence: "Ctrl+Return"; onActivated: studio.detectCurrent() }
     Shortcut { sequence: "Ctrl+S"; onActivated: studio.exportCurrent("annotated") }
 
+    Loader {
+        id: liquidLoader
+        objectName: "liquidBackgroundLoader"
+        anchors.fill: parent
+        active: !root.s.reducedMotion && root.GraphicsInfo.api !== GraphicsInfo.Software
+        sourceComponent: LiquidBackground {
+            animating: root.visible && root.visibility !== Window.Minimized
+            pointerInside: ambientHover.hovered
+            pointerPosition: Qt.point(ambientHover.point.position.x / Math.max(1, root.width), ambientHover.point.position.y / Math.max(1, root.height))
+        }
+    }
+    HoverHandler {
+        id: ambientHover
+        enabled: Theme.glassEnabled
+        blocking: false
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+    }
+
     ColumnLayout {
         anchors.fill: parent; spacing: 0
-        Rectangle {
-            Layout.fillWidth: true; Layout.preferredHeight: 76; color: Theme.panel
+        GlassSurface {
+            Layout.fillWidth: true; Layout.preferredHeight: 76; tint: Theme.panel
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 22; anchors.rightMargin: 22; spacing: 14
                 Rectangle { width: 38; height: 38; radius: 11; color: Theme.accentFill; Icon { name: "snow"; anchors.centerIn: parent; width: 24; height: 24; ink: Theme.accent } }
@@ -62,9 +82,9 @@ ApplicationWindow {
         RowLayout {
             Layout.fillWidth: true; Layout.fillHeight: true; spacing: 0
             // Library — restrained material and persistent spatial organization.
-            Rectangle {
+            GlassSurface {
                 Layout.preferredWidth: root.width < 1250 ? 206 : 238
-                Layout.fillHeight: true; color: Theme.sidebar
+                Layout.fillHeight: true; tint: Theme.sidebar; materialWeight: 0.67
                 ColumnLayout {
                     anchors.fill: parent; anchors.margins: 14; spacing: 12
                     RowLayout {
@@ -122,8 +142,8 @@ ApplicationWindow {
             Rectangle { width: 1; Layout.fillHeight: true; color: Theme.border }
             ColumnLayout {
                 Layout.fillWidth: true; Layout.fillHeight: true; spacing: 0
-                Rectangle {
-                    Layout.fillWidth: true; Layout.preferredHeight: 58; color: Theme.panel
+                GlassSurface {
+                    Layout.fillWidth: true; Layout.preferredHeight: 58; tint: Theme.panel
                     RowLayout {
                         anchors.fill: parent; anchors.leftMargin: 18; anchors.rightMargin: 14; spacing: 8
                         ColumnLayout {
@@ -138,8 +158,8 @@ ApplicationWindow {
                     }
                 }
                 ImageViewport { id: viewport; objectName: "imageViewport"; Layout.fillWidth: true; Layout.fillHeight: true; viewState: root.s; boxes: root.boxes }
-                Rectangle {
-                    Layout.fillWidth: true; Layout.preferredHeight: 37; color: Theme.panel
+                GlassSurface {
+                    Layout.fillWidth: true; Layout.preferredHeight: 37; tint: Theme.panel
                     RowLayout {
                         anchors.fill: parent; anchors.leftMargin: 18; anchors.rightMargin: 18
                         Rectangle { width: 6; height: 6; radius: 3; color: root.s.busy || root.s.loading ? Theme.accent : root.s.ready ? Theme.success : Theme.error }
@@ -150,9 +170,9 @@ ApplicationWindow {
                 }
             }
             Rectangle { width: 1; Layout.fillHeight: true; color: Theme.border }
-            Rectangle {
+            GlassSurface {
                 Layout.preferredWidth: root.width < 1250 ? 286 : 316
-                Layout.fillHeight: true; color: Theme.panel
+                Layout.fillHeight: true; tint: Theme.panel; materialWeight: 0.78
                 ScrollView {
                     id: inspectorScroll
                     anchors.fill: parent; clip: true
@@ -252,16 +272,25 @@ ApplicationWindow {
                                 StudioButton { Layout.fillWidth: true; text: "JSON"; enabled: root.s.hasResult && !root.s.exporting; onClicked: studio.exportCurrent("json") }
                             }
                             StudioButton { Layout.fillWidth: true; text: root.s.exporting ? "正在导出…" : "批量导出全部结果"; enabled: studio.library.count > 0 && !root.s.busy && !root.s.exporting; onClicked: studio.exportAll() }
-                            CheckBox { text: "减少动效"; checked: root.s.reducedMotion; onToggled: studio.setReducedMotion(checked); font.pixelSize: 10; palette.windowText: Theme.muted; Layout.topMargin: 4 }
+                            CheckBox {
+                                objectName: "reducedMotionCheck"
+                                text: "减少动效"; checked: root.s.reducedMotion
+                                onToggled: studio.setReducedMotion(checked)
+                                font.pixelSize: 10; palette.windowText: Theme.muted; Layout.topMargin: 4
+                                hoverEnabled: true
+                                ToolTip.visible: hovered
+                                ToolTip.text: "关闭流彩背景与玻璃效果，恢复静态界面。"
+                                ToolTip.delay: 600
+                            }
                         }
                     }
                 }
             }
         }
-        Rectangle {
+        GlassSurface {
             Layout.fillWidth: true; Layout.preferredHeight: root.s.notice.length ? Math.max(42, noticeText.implicitHeight + 20) : 0
             visible: root.s.notice.length > 0
-            color: root.s.noticeKind === "error" ? (Theme.dark ? "#382b2d" : "#fff0ef") : root.s.noticeKind === "warning" ? (Theme.dark ? "#363022" : "#fff8e9") : Theme.panel
+            tint: root.s.noticeKind === "error" ? (Theme.dark ? "#382b2d" : "#fff0ef") : root.s.noticeKind === "warning" ? (Theme.dark ? "#363022" : "#fff8e9") : Theme.panel
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 20; anchors.rightMargin: 12; spacing: 10
                 Rectangle { width: 6; height: 6; radius: 3; color: root.s.noticeKind === "error" ? Theme.error : root.s.noticeKind === "warning" ? Theme.warning : root.s.noticeKind === "success" ? Theme.success : Theme.accent }

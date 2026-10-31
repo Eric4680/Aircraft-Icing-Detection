@@ -30,7 +30,10 @@ Item {
     }
     Connections { target: studio; function onViewReset() { viewport.fit() } }
 
-    Rectangle { anchors.fill: parent; color: Theme.canvas }
+    Rectangle {
+        anchors.fill: parent
+        color: Theme.glassEnabled ? (Theme.dark ? "#2012151a" : "#10ffffff") : Theme.canvas
+    }
     Column {
         visible: !viewport.viewState.hasImage
         anchors.centerIn: parent; spacing: 18
@@ -113,11 +116,11 @@ Item {
     }
 
     BusyIndicator { anchors.centerIn: parent; running: viewport.viewState.hasImage && viewport.viewState.preview === ""; visible: running; palette.dark: Theme.accent }
-    Rectangle {
+    GlassSurface {
         visible: viewport.viewState.hasImage
         anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.bottom; anchors.bottomMargin: 20
         width: tools.implicitWidth + 16; height: 44; radius: 12
-        color: Theme.panel; border.color: Theme.border
+        tint: Theme.panel; border.color: Theme.border
         Row {
             id: tools; spacing: 3; anchors.centerIn: parent
             StudioButton { quiet: true; symbol: "minus"; hint: "缩小"; onClicked: viewport.zoomAt(1 / 1.2, viewport.width / 2, viewport.height / 2) }

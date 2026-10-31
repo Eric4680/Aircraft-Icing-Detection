@@ -36,6 +36,7 @@ from studio.controller import StudioController
 from studio.domain import load_config, result_document, visible_detections
 from studio.imaging import read_image, render_annotations
 from studio.workers import ImageProvider
+from studio.ambient import WaterImageProvider
 
 
 def main():
@@ -68,6 +69,7 @@ def main():
     original_theme = controller.state["theme"]
     original_motion = controller.state["reducedMotion"]
     engine = QQmlApplicationEngine()
+    engine.addImageProvider("ambient", WaterImageProvider())
     engine.addImageProvider("media", provider)
     engine.rootContext().setContextProperty("studio", controller)
     engine.load(QUrl.fromLocalFile(str(APP / "qml" / "Main.qml")))

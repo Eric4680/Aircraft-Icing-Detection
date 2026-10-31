@@ -1,6 +1,6 @@
 # 第一版执行自检记录
 
-执行者：Sol。更新日期：2026-10-28（北京时间）。本记录是当前软件执行自检，不代替 Astra 的独立验收或模型质量评测。
+执行者：Sol。更新日期：2026-10-31（北京时间）。本记录是当前软件执行自检，不代替 Astra 的独立验收或模型质量评测。
 
 ## 实际资源
 
@@ -9,7 +9,7 @@
 - SHA-256：`15a0083a9cda998a52515e63c7f78d93735fa2201d467818d9aefb1f54c84e60`。
 - 实际任务 `detect`，类别 `{0: Icing}`，结构配置 `yolo26s.yaml`，640 输入，保存版本 Ultralytics 8.4.55。
 - 8.4.55 实际 `end2end=True`。8.4.190 曾将该旧检查点解释为 `False`，已固定训练时版本并在运行时校验。
-- 指定的外部 apple-design Skill 已完整读取并应用；没有移动或复制 `.agents`。
+- 外部 apple-design、animate、emil-design-eng Skill 已读取并应用；没有移动或复制 `.agents`。
 
 ## 已通过的真实检查
 
@@ -32,7 +32,13 @@
 | 显示与导出一致 | 当前置信度筛选；0% 不透明度导出像素不变；原图 PNG 副本与解码后原图像素一致 |
 | 异常输入 | 损坏 PNG 被拒绝，另外两张有效照片继续工作 |
 | 离线 | 应用测试流程将 Python 外连 socket 设为不可用，记录外连尝试 0 次，整个推理与导出通过 |
-| 事件循环 | 后台模型/文件工作时主界面计时器持续运行；当前原生测试最大观测间隔约 148 ms |
+| 流彩与玻璃 | 原生着色器产生变化像素；面板共享背景纹理并磨砂处理，照片和检测框保持原图显示 |
+| 固定参数 | 使用用户确认的 12 项数值，界面没有背景参数面板；主流场 72 秒、环流 600 秒 |
+| 鼠标扰动 | 实际 Qt 鼠标事件触达背景；停留积累水纹，移开后继续衰减，最终释放轨迹 |
+| 减少动效 | 实际勾选控件卸载背景和玻璃着色器、纹理与水纹计时器；画布恢复原色 `#e7ebf0`；取消勾选后像素继续变化 |
+| 渲染回退 | 软件渲染环境不创建背景，使用静态外观，真实照片仍能推理 |
+| 最小化 | 背景时钟与水纹计算均暂停，恢复窗口后继续 |
+| 事件循环 | 后台模型/文件工作时主界面计时器持续运行；本次流彩原生完整回归最大观测间隔约 178 ms |
 | 构建基础 | Python 编译检查、PowerShell 安装/打包脚本语法检查、pip 依赖检查通过 |
 
 最终默认渲染原生窗口记录：`.runtime/verification/native/report.json`。150% DPI 记录：`.runtime/verification/hidpi/report.json`。普通离屏记录：`.runtime/verification/report.json`。
@@ -42,11 +48,18 @@
 1. `Airfraft icing.v1i.coco/test/09r-218_019_jpg.rf.e6277648793142c5a12ad4d2f3c0b96b.jpg`：640×640，默认阈值输出 1 个框，置信度约 83.7%。
 2. `data/Originals/batch_06_new_sites_icing_20261027/images/01_清晰原图/02_TC_机翼前缘积冰.jpg`：941×706，默认阈值输出 1 个框。
 
-当前原生检查中首次 GPU 调用约 376 ms，第二张约 20 ms。受 GPU 其他负载、首次初始化和输入影响，这些数字仅是执行记录，不是性能承诺。耗时包含推理准备与后处理，不含前面的图片解码和文件哈希。
+当前原生检查中首次 GPU 调用约 372 ms，第二张约 19 ms。受 GPU 其他负载、首次初始化和输入影响，这些数字仅是执行记录，不是性能承诺。耗时包含推理准备与后处理，不含前面的图片解码和文件哈希。
 
 ## 视觉证据
 
 截图由真实 Qt 窗口的 `grabWindow()` 产生，不是静态设计稿。已查看浅色、深色、紧凑布局及非方图的实际画面。Windows 桌面截图辅助工具曾连续超时，因此改用 Qt 自身窗口截图和 QtTest 窗口输入完成验证。
+
+流彩专用测试报告位于 `.runtime/verification/background/report.json`，软件回退报告为同目录的 `software_report.json`。已完成原生及 150% DPI 检查，着色器无运行警告；水纹固定为 288×208 网格，背景渲染纹理宽度最多 1000 像素。专用测试逐步计算水纹平均约 1 ms；这不包含 GPU 着色器帧时，未声称对所有电脑都达到固定帧率。
+
+- `.runtime/verification/background/liquid_light.png`
+- `.runtime/verification/background/liquid_dark.png`
+- `.runtime/verification/background/liquid_detection.png`
+- `.runtime/verification/background/static_light.png`
 
 - `.runtime/verification/native/empty_light.png`
 - `.runtime/verification/native/detection_light.png`
@@ -55,7 +68,7 @@
 - `.runtime/verification/native/wide_image.png`
 - `.runtime/verification/hidpi/parameter_help.png`
 
-界面按用户意见原位更新：参数解释收进问号，结果区常驻提醒和顶部隐私强调已移除。代码及上述同名截图直接覆盖，没有另存旧版界面、增加动画库或改变推理/导出逻辑。原生悬停自动测试受实时桌面鼠标影响，因此悬停断言在Qt离屏环境完成，原生窗口继续验证渲染、控件和真实推理。
+界面按用户意见原位更新，代码及同名截图直接覆盖，没有另存旧版源码或增加浏览器/动画依赖；推理与导出逻辑未改变。改动前 Git 检查点为 `74abf39`。参数问号的悬停断言沿用此前离屏验证，原生窗口继续验证实际布局、输入、背景悬停和真实推理。
 
 ## 限制和边界
 

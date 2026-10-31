@@ -58,6 +58,7 @@ def main():
     from PySide6.QtWidgets import QApplication
     from studio.controller import StudioController
     from studio.workers import ImageProvider
+    from studio.ambient import WaterImageProvider
 
     qInstallMessageHandler(lambda kind, context, message: logging.getLogger("qt").warning(message))
     application = QApplication(sys.argv[:1])
@@ -69,6 +70,7 @@ def main():
     provider = ImageProvider()
     controller = StudioController(config, provider)
     engine = QQmlApplicationEngine()
+    engine.addImageProvider("ambient", WaterImageProvider())
     engine.addImageProvider("media", provider)
     engine.rootContext().setContextProperty("studio", controller)
     engine.load(QUrl.fromLocalFile(str(RESOURCE_DIR / "qml" / "Main.qml")))

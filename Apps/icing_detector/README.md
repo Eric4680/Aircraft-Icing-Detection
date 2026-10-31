@@ -121,6 +121,18 @@ Apps/icing_detector/
 
 ## 测试与打包
 
+### 流彩背景与玻璃材质
+
+背景由提供的 `liquid-pigment-ice.html` 移植为 Qt 原生着色器，不嵌入浏览器。保留噪声流场、周期环流、颜料混色、薄膜纹理及鼠标水纹；照片、检测框和导出内容不经过背景处理。工具栏和侧栏采样同一张背景纹理，进行磨砂模糊和材质叠色。
+
+背景采用用户确认的固定参数，App 中不提供调节面板：流动周期 72 秒、环流周期 600 秒、环流柔度 76%、流动幅度 67%、色彩交融 55%、纹理细节 60%、薄膜光泽 33%、色彩浓度 100%；鼠标扰动 85%、扰动范围 60%、酝酿时长 2.5 秒、轨迹留存 6 秒。轨迹留存后另有原算法的 5 秒自然衰减。
+
+勾选“减少动效”会卸载整个背景、玻璃着色器及水纹计时器，恢复原有静态界面；浅色模式恢复白色面板和灰色画布，深色模式恢复原有深色面板。取消勾选会重新启用背景。窗口最小化时暂停计算，不支持着色器的软件渲染环境自动使用静态外观。
+
+相关代码为 `qml/LiquidBackground.qml`、`qml/GlassSurface.qml`、`qml/shaders/` 和 `studio/ambient.py`。着色器 `.qsb` 已随代码提供，直接启动无需编译；修改 `.frag` 后运行 `packaging/build_shaders.ps1` 更新。现有打包脚本已包含整个 `qml` 目录，因此会携带着色器文件。
+
+实现依据：[Qt ShaderEffect](https://doc.qt.io/qt-6/qml-qtquick-shadereffect.html)、[ShaderEffectSource](https://doc.qt.io/qt-6/qml-qtquick-shadereffectsource.html) 和 [QSB](https://doc.qt.io/qt-6/qtshadertools-qsb.html)。专用背景验证为 `.venv\Scripts\python.exe tests\verify_background.py --image "真实照片.jpg"`；加 `--software` 检查静态回退。
+
 见 **`QA.md`** 和 `.runtime/verification/native/report.json`。可用任意自己选择的真实图片重新执行：
 
 ```powershell

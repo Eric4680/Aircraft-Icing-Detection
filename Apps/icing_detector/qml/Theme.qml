@@ -4,6 +4,8 @@ import QtQuick
 QtObject {
     property bool dark: false
     property bool reducedMotion: false
+    property var backdrop: null
+    property bool glassEnabled: false
     readonly property color background: dark ? "#171a20" : "#f5f6f8"
     readonly property color panel: dark ? "#20242b" : "#ffffff"
     readonly property color sidebar: dark ? "#1c2027" : "#edf0f4"
