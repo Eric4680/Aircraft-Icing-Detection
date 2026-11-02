@@ -16,12 +16,15 @@ __pycache__/
 /Apps/**/build/
 /Apps/**/dist/
 
-# Datasets are stored separately; lightweight manifests may be tracked
+# Keep version-one dataset available to collaborators; exclude other local data
 /Datasets/*
 !/Datasets/.gitkeep
 !/Datasets/Manifests/
+!/Datasets/v1_annotated/
+/Datasets/v1_annotated/*
+!/Datasets/v1_annotated/Aircraft Ice Detection.v1i.yolo26.zip
 
-# Model artifacts stay local; model descriptions/configuration remain trackable
+# Exclude local model artifacts except the shared version-one checkpoint
 /Models/**/*.pt
 /Models/**/*.pth
 /Models/**/*.onnx
@@ -29,6 +32,7 @@ __pycache__/
 /Models/**/*.ckpt
 /Models/**/*.safetensors
 /Models/**/*.tflite
+!/Models/aircraft-ice-detection-1-yolo26s-t1/weights.pt
 
 # OS-generated files
 Thumbs.db
