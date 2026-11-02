@@ -1,12 +1,14 @@
 # Aircraft Icing Detection Studio
 
+**更新时间：2026-11-03**
+
 Windows 桌面工具，使用本地 YOLO26 Small 模型检测照片中的 `Icing` 覆冰区域。
 
 ## 下载与启动
 
 1. 在 GitHub 点击 **Code → Download ZIP**，下载后**完整解压**。
 2. 打开解压后的 **`Apps/icing_detector`** 文件夹，双击 **`START.cmd`**。
-3. 首次使用点击向导中的**“开始安装”**，等待完成，App 会自动打开。
+3. 首次使用点击向导中的 **“开始安装”**，等待完成，App 会自动打开。
 
 **首次安装需要联网，无需手动安装 Python。以后直接双击 `START.cmd` 即可。**
 
