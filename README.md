@@ -1,8 +1,6 @@
-2026/11/03
-Eric_4678
+## Aircraft Icing Detection Studio
 
-# Aircraft Icing Detection Studio
-
+编辑时间：2026/11/03
 飞行器可见覆冰区域检测项目。Windows 桌面 App 使用本地 YOLO26 Small 模型，输出 `Icing` 类别的检测框。
 
 ## 当前的项目内容
