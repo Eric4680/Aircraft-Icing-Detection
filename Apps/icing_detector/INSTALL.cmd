@@ -1,11 +1,5 @@
 @echo off
 setlocal
 cd /d "%~dp0"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup.ps1" %*
-if errorlevel 1 (
-    echo Installation did not complete. See the message above.
-    pause
-    exit /b 1
-)
-echo Ready. Launch START.cmd.
-pause
+start "" powershell.exe -NoProfile -STA -WindowStyle Hidden -ExecutionPolicy Bypass -File "%~dp0install.ps1" %*
+exit /b 0

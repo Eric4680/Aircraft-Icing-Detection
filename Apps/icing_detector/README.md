@@ -4,7 +4,9 @@ Windows 原生桌面应用，Python + PySide6 / Qt Quick / QML。使用本机 YO
 
 ## 现在就用
 
-双击本目录的 **`START.cmd`**。当前机器环境已配置并完成真实推理测试，不需要再次安装依赖。
+完整解压项目后，双击本目录的 **`START.cmd`**。首次使用会打开安装向导：点击“开始安装”，自动准备 Python、运行库和依赖，实际加载权重验证成功后打开 App。已有可用环境会直接启动。
+
+无需预先安装 Python，也无需手动创建 `.venv`。首次安装需要联网；安装和修复也可以单独双击 **`INSTALL.cmd`**。向导支持查看真实安装输出、打开日志、失败重试和取消。网络受限时，可填写代理地址；计算模式可选择自动、CPU 或 NVIDIA GPU。
 
 1. 点击「导入图片」，也可以拖入图片，或按 **Ctrl+V** 粘贴图片/图片文件。
 2. 点击左侧缩略图自动检测；「批量检测」处理列表中尚未完成当前参数检测的图片。
@@ -46,7 +48,7 @@ Windows 原生桌面应用，Python + PySide6 / Qt Quick / QML。使用本机 YO
 
 浅色/深色按钮在右上角；右侧底部可勾选「减少动效」。这两项会记住；检测参数每次启动恢复默认。首开尺寸按当前屏幕可用区域调整，支持 Qt 自动高 DPI，最小内容窗口 960×640。
 
-置信度、IoU、不透明度标题旁的圆圈问号提供简短用途说明，鼠标悬停或键盘聚焦时显示。GPU 名称由本机 CUDA 设备读取，以 `GPU (实际型号)` 显示；名称过长时保留首尾，悬停可查看完整名称。
+置信度和 IoU 标题旁的圆圈问号提供简短用途说明，鼠标悬停或键盘聚焦时显示。GPU 名称由本机 CUDA 设备读取，以 `GPU (实际型号)` 显示；名称过长时保留首尾，悬停可查看完整名称。
 
 | 快捷键 | 功能 |
 |---|---|
@@ -80,14 +82,18 @@ E:/CodexWorkspace/.venvs/aircraft-icing-yolo-cuda/Lib/site-packages
 
 应用自己的 `.venv/Lib/site-packages/icing_shared_cuda.pth` 将这个位置追加到包搜索路径。Qt、Ultralytics 8.4.55 等应用依赖仍优先取本模块自己的环境；没有修改共享环境。若这个共享目录被删除或移动，当前启动环境的 Torch 将不可用，请运行安装脚本建立可用的独立 Torch 环境。不要把 `.venv` 直接复制到另一台电脑。
 
-在新电脑上，安装 Python 3.12 x64，然后双击 `INSTALL.cmd`。安装脚本优先复用已经可用的 CUDA；缺少时为 NVIDIA 尝试官方 CUDA 12.8 Torch，下载失败的自动模式可退到 CPU。也可明确选择：
+安装向导由 Windows 自带的 PowerShell / Windows Forms 运行，支持 Windows x64。先检查权重与哈希，再检测本机 Python 3.12；没有时下载经过 SHA-256 校验的 uv 0.13.6，再由 uv 准备 CPython 3.12，保存在本 App 的 `.runtime/python`。它使用 [Astral 的独立 CPython 发行版](https://docs.astral.sh/uv/guides/install-python/)，不修改系统 PATH 或注册其他项目的 Python。
+
+已匹配依赖的环境直接复用。全新环境安装 PyTorch 2.14.1 / torchvision 0.29.1；自动模式检测到 NVIDIA 时尝试官方 CUDA 12.6 运行库，下载失败后改用 CPU；也可以在向导中直接选择 CPU。旧脚本中的 Torch 2.9.1 在本轮全新 Python 环境的后台推理测试中出现原生崩溃，已提高依赖最低版本并用 2.14.1 完成回归。命令行也可指定向导选项：
 
 ```powershell
 .\INSTALL.cmd -Device cpu
 .\INSTALL.cmd -Device cuda
 ```
 
-安装需要网络；正常使用无需网络。当前 CUDA 13.2 共享环境已实测；脚本提供的 CUDA 12.8 全新安装路径未在本轮另一台干净机器上重建验证。`requirements.txt` 固定 Qt、Ultralytics 和直接图像依赖，Torch/torchvision 使用兼容范围以允许现有 CUDA 环境复用；实际版本以本节和测试报告为准。
+安装需要网络；正常使用无需网络。可选代理格式为 `http://地址:端口`，仅用于本次安装，不接受内嵌账号密码。日志为 `.runtime/install-output.log`、`.runtime/install-error.log`，状态文件为 `.runtime/install-status.json`。再次安装会覆盖这几个安装日志，已有环境可离线复用验证。
+
+本轮已在隔离目录中忽略系统 Python，真实下载 CPython 3.12.16、建立全新 CPU 环境，并通过真实照片、GUI、坐标、导出及离线回归；原有共享 CUDA 环境也已验证复用。隔离目录测试不等同于另一台实体电脑：全新 CUDA 12.6 下载链路和各类驱动仍需在对应电脑验证。
 
 安装脚本不要求管理员权限，不复制虚拟环境，不更改系统设置。当前开发工具需要额外权限加载原生库，是工具执行环境的限制，不是应用要求提权。
 
@@ -95,12 +101,14 @@ E:/CodexWorkspace/.venvs/aircraft-icing-yolo-cuda/Lib/site-packages
 
 ```text
 Apps/icing_detector/
-├─ START.cmd / INSTALL.cmd       # 启动与依赖安装
+├─ START.cmd / INSTALL.cmd       # 启动与图形安装入口
+├─ install.ps1                  # 无需 Python 的原生安装向导
 ├─ app.py                       # 原生桌面入口、日志、资源路径
 ├─ config.json                  # 模型路径、名称、哈希和推理约定
 ├─ requirements.txt / setup.ps1
 ├─ studio/
 │  ├─ inference.py              # YOLO 实例、设备、真实推理
+│  ├─ environment.py            # 启动前依赖检查
 │  ├─ imaging.py                # 方向纠正与原图分辨率渲染
 │  ├─ domain.py                 # 结果契约、筛选、JSON
 │  ├─ workers.py                # 推理、文件与预览三个后台所有者
@@ -118,6 +126,8 @@ Apps/icing_detector/
 主要业务通过普通字典传递结构化结果，Qt 线程通过队列信号交接。模型、图像读写、图形界面分层；未来模块应增加自己的模型适配与结果契约，不把其他模型猜测成 Icing 检测输出。
 
 日志在 `.runtime/studio.log`，自动轮转。剪贴板图片会保存成本地 `.runtime/clipboard/` PNG，供当前会话检测与导出；没有上传。关闭应用后可手动清理这些缓存，应用不在后台自动删除用户数据。
+
+开发时在编辑器中选择本目录的 `.venv/Scripts/python.exe`。安装器测试入口为 `powershell -NoProfile -ExecutionPolicy Bypass -File tests/verify_installer.ps1 -ManagedPython`；有需要可附加 `-Proxy http://地址:端口`。首次测试会在 `.runtime/installer-verification` 中下载并创建独立 CPU 环境，已有测试环境则用于复用和修复检查。
 
 ## 测试与打包
 
@@ -142,5 +152,3 @@ Apps/icing_detector/
 测试的首张照片需在默认阈值下有模型输出；测试会故意导入损坏图片、触发一次 GPU 异常并验证真实 CPU 回退。它不是训练脚本，也不向外发送图片。无桌面检查可省略 `--native`，使用 Qt 离屏渲染；设置 `QT_SCALE_FACTOR=1.5` 可检查高 DPI。测试截图来自实际 QML 和真实模型结果。
 
 `packaging/build_exe.ps1` 预留 PyInstaller **onedir** 打包流程，模型保持外置，配置在 exe 旁，构建目录限制在本应用内。该脚本已检查语法，**本轮没有构建或验收 `.exe`**；后续还需核对 Qt 插件、CUDA 依赖、冷启动和分发许可。生成的配置引用当前模型绝对位置，换电脑部署需修改路径并重新核对哈希。
-
-本轮提供的是可启动、已实际测试的第一版源码应用。没有训练新模型，没有给出模型质量达标结论；两个功能样例不是独立评测集，最终质量验收由 Astra 负责。
